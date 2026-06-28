@@ -1,0 +1,1466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TSLMY Intern Quest Assessment</title>
+  <style>
+    :root {
+      --bg: #0f1220;
+      --panel: #171b2f;
+      --panel-2: #202541;
+      --text: #f6f7fb;
+      --muted: #aab0c6;
+      --accent: #ffcf33;
+      --accent-2: #6ee7b7;
+      --danger: #ff6b6b;
+      --line: rgba(255,255,255,0.12);
+      --shadow: 0 20px 60px rgba(0,0,0,0.35);
+      --radius: 22px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at 15% 15%, rgba(255,207,51,0.18), transparent 32%),
+        radial-gradient(circle at 85% 0%, rgba(110,231,183,0.13), transparent 28%),
+        linear-gradient(135deg, #0f1220 0%, #14182b 55%, #101421 100%);
+      color: var(--text);
+    }
+
+    button, input, select, textarea { font: inherit; }
+
+    .app {
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 28px 0 64px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+    }
+
+    .brand-mark {
+      width: 42px;
+      height: 42px;
+      border-radius: 14px;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, var(--accent), #ff8a3d);
+      color: #11131c;
+      box-shadow: 0 10px 30px rgba(255,207,51,0.25);
+    }
+
+    .chip-row { display: flex; gap: 8px; flex-wrap: wrap; }
+
+    .chip {
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.06);
+      color: var(--muted);
+      padding: 8px 12px;
+      border-radius: 999px;
+      font-size: 13px;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 320px 1fr;
+      gap: 20px;
+      align-items: start;
+    }
+
+    .sidebar, .card {
+      background: rgba(23,27,47,0.86);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(18px);
+    }
+
+    .sidebar {
+      padding: 18px;
+      position: sticky;
+      top: 18px;
+    }
+
+    .card {
+      padding: 30px;
+      min-height: 640px;
+    }
+
+    .stage-title {
+      font-size: 13px;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      font-weight: 800;
+      margin-bottom: 8px;
+    }
+
+    h1, h2, h3 { margin: 0; line-height: 1.05; }
+    h1 { font-size: clamp(34px, 5vw, 62px); letter-spacing: -0.06em; }
+    h2 { font-size: clamp(26px, 4vw, 42px); letter-spacing: -0.04em; }
+    h3 { font-size: 19px; letter-spacing: -0.02em; }
+
+    p { color: var(--muted); line-height: 1.65; }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 24px;
+      align-items: center;
+    }
+
+    .hero-visual {
+      background: linear-gradient(160deg, rgba(255,207,51,0.18), rgba(110,231,183,0.09));
+      border: 1px solid var(--line);
+      border-radius: 26px;
+      padding: 22px;
+      min-height: 320px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-visual::before {
+      content: "";
+      position: absolute;
+      width: 220px;
+      height: 220px;
+      right: -70px;
+      top: -60px;
+      background: rgba(255,255,255,0.12);
+      border-radius: 50%;
+    }
+
+    .quest-map { position: relative; z-index: 1; display: grid; gap: 12px; }
+
+    .map-node {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 13px;
+      background: rgba(15,18,32,0.55);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+    }
+
+    .node-badge {
+      width: 36px;
+      height: 36px;
+      display: grid;
+      place-items: center;
+      border-radius: 12px;
+      background: rgba(255,207,51,0.16);
+      color: var(--accent);
+      font-weight: 800;
+    }
+
+    .btn-row { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 24px; }
+
+    .btn {
+      border: 0;
+      cursor: pointer;
+      padding: 13px 18px;
+      border-radius: 14px;
+      font-weight: 800;
+      color: #11131c;
+      background: var(--accent);
+      transition: transform .15s ease, opacity .15s ease, box-shadow .15s ease;
+      box-shadow: 0 10px 26px rgba(255,207,51,0.18);
+    }
+
+    .btn:hover { transform: translateY(-1px); box-shadow: 0 14px 34px rgba(255,207,51,0.24); }
+    .btn:disabled { opacity: .45; cursor: not-allowed; transform: none; box-shadow: none; }
+
+    .btn.secondary {
+      color: var(--text);
+      background: rgba(255,255,255,0.08);
+      border: 1px solid var(--line);
+      box-shadow: none;
+    }
+
+    .btn.success { background: var(--accent-2); }
+    .btn.danger { background: transparent; color: var(--danger); border: 1px solid rgba(255,107,107,.4); box-shadow: none; }
+
+    .progress-wrap { margin: 18px 0; }
+    .progress-meta { display:flex; justify-content:space-between; gap:10px; color:var(--muted); font-size:13px; margin-bottom:8px; }
+    .progress-track { height: 12px; background: rgba(255,255,255,0.07); border-radius: 999px; overflow: hidden; border:1px solid var(--line); }
+    .progress-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent-2)); width: 0%; transition: width .35s ease; }
+
+    .stat-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 14px; }
+    .stat { padding: 14px; background: rgba(255,255,255,0.055); border: 1px solid var(--line); border-radius: 16px; }
+    .stat strong { display:block; font-size: 22px; letter-spacing: -0.04em; }
+    .stat span { color: var(--muted); font-size: 12px; }
+
+    .levels { margin-top: 16px; display:grid; gap:8px; }
+    .level {
+      display:flex; align-items:center; gap:10px;
+      color: var(--muted); font-size: 13px;
+      padding: 9px 10px; border-radius: 13px;
+      background: rgba(255,255,255,0.035);
+      border: 1px solid transparent;
+    }
+    .level.active { color: var(--text); border-color: rgba(255,207,51,0.32); background: rgba(255,207,51,0.08); }
+    .level.done { color: var(--accent-2); }
+
+    .form-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin-top: 18px; }
+    .field { display: grid; gap: 7px; }
+    .field.full { grid-column: 1 / -1; }
+    label { color: var(--muted); font-size: 13px; font-weight: 700; }
+    input, select, textarea {
+      width: 100%;
+      color: var(--text);
+      background: rgba(255,255,255,0.06);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 13px 14px;
+      outline: none;
+    }
+    input:focus, select:focus, textarea:focus { border-color: rgba(255,207,51,0.55); box-shadow: 0 0 0 4px rgba(255,207,51,0.08); }
+    textarea { min-height: 126px; resize: vertical; }
+
+    .consent-box {
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: rgba(255,255,255,0.045);
+      display: flex;
+      gap: 11px;
+      align-items: flex-start;
+      margin-top: 14px;
+    }
+    .consent-box input { width: auto; margin-top: 4px; }
+
+    .question-card {
+      display: grid;
+      gap: 18px;
+      animation: rise .25s ease;
+    }
+
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .question-number { color: var(--accent); font-weight: 900; font-size: 14px; letter-spacing: .08em; text-transform: uppercase; }
+    .question-text { font-size: clamp(24px, 3.4vw, 38px); letter-spacing: -0.045em; line-height: 1.12; font-weight: 900; }
+
+    .options { display: grid; gap: 12px; margin-top: 8px; }
+    .option {
+      width: 100%;
+      text-align: left;
+      color: var(--text);
+      background: rgba(255,255,255,0.055);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 15px 16px;
+      display: grid;
+      grid-template-columns: 42px 1fr;
+      gap: 12px;
+      cursor: pointer;
+      transition: transform .15s ease, border-color .15s ease, background .15s ease;
+    }
+    .option:hover { transform: translateY(-1px); border-color: rgba(255,207,51,0.42); background: rgba(255,207,51,0.06); }
+    .option.selected { border-color: rgba(110,231,183,0.64); background: rgba(110,231,183,0.1); }
+    .option-letter {
+      width: 42px; height: 42px; border-radius: 14px; display:grid; place-items:center;
+      font-weight: 900; color: var(--accent); background: rgba(255,207,51,0.1);
+    }
+    .option-text { align-self:center; line-height: 1.45; }
+    .micro-feedback {
+      min-height: 58px;
+      padding: 14px;
+      background: rgba(110,231,183,0.08);
+      border: 1px solid rgba(110,231,183,0.20);
+      border-radius: 16px;
+      color: #d9fff1;
+      display:none;
+    }
+    .micro-feedback.show { display:block; }
+
+    .pill-grid { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+    .pill { padding: 8px 10px; border-radius: 999px; border: 1px solid var(--line); color: var(--muted); font-size: 12px; background: rgba(255,255,255,0.045); }
+
+    .result-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 20px; }
+    .result-card { padding: 18px; border: 1px solid var(--line); border-radius: 18px; background: rgba(255,255,255,0.055); }
+    .result-card h3 { margin-bottom: 10px; }
+    .bar { display:grid; gap:6px; margin: 12px 0; }
+    .bar-label { display:flex; justify-content:space-between; gap:12px; font-size:13px; color:var(--muted); }
+    .bar-track { height: 10px; border-radius: 999px; background: rgba(255,255,255,0.08); overflow:hidden; border: 1px solid var(--line); }
+    .bar-fill { height: 100%; width: 0%; background: linear-gradient(90deg, var(--accent), var(--accent-2)); border-radius: 999px; }
+
+    .summary-table { width:100%; border-collapse: collapse; margin-top: 12px; overflow:hidden; border-radius: 14px; }
+    .summary-table th, .summary-table td { padding: 12px; border-bottom: 1px solid var(--line); text-align:left; vertical-align: top; }
+    .summary-table th { color: var(--accent); font-size:13px; background: rgba(255,255,255,0.04); }
+    .summary-table td { color: var(--muted); font-size: 14px; }
+
+    .badge-preview {
+      width: min(100%, 420px);
+      aspect-ratio: 1.55 / 1;
+      border-radius: 28px;
+      background:
+        radial-gradient(circle at 20% 20%, rgba(255,255,255,0.22), transparent 30%),
+        linear-gradient(135deg, #ffcf33, #ff8a3d 55%, #6ee7b7);
+      color: #11131c;
+      padding: 24px;
+      display:flex;
+      flex-direction:column;
+      justify-content:space-between;
+      box-shadow: 0 20px 50px rgba(255,207,51,0.20);
+    }
+    .badge-preview .small { font-size:12px; font-weight:900; text-transform:uppercase; letter-spacing:.1em; opacity:.75; }
+    .badge-preview .big { font-size: 30px; font-weight: 1000; line-height: 1; letter-spacing:-.05em; }
+    .badge-preview .foot { display:flex; justify-content:space-between; gap:12px; font-weight:900; font-size: 12px; }
+
+    .hidden { display: none !important; }
+    .muted { color: var(--muted); }
+    .accent { color: var(--accent); }
+    .success { color: var(--accent-2); }
+    .danger-text { color: var(--danger); }
+    .small-note { font-size: 12px; color: var(--muted); line-height: 1.55; }
+
+    @media (max-width: 900px) {
+      .layout, .hero-grid, .result-grid { grid-template-columns: 1fr; }
+      .sidebar { position: relative; top: 0; }
+      .form-grid { grid-template-columns: 1fr; }
+      .card { min-height: auto; padding: 22px; }
+      .topbar { align-items: flex-start; flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-mark">TSL</div>
+        <div>
+          <div>Intern Quest Assessment</div>
+          <div class="small-note">Selection support · Workstyle · Role fit · Learning signals</div>
+        </div>
+      </div>
+      <div class="chip-row">
+        <div class="chip">No right/wrong personality</div>
+        <div class="chip">HR + HM review</div>
+        <div class="chip">Local-only prototype</div>
+      </div>
+    </header>
+
+    <main class="layout">
+      <aside class="sidebar">
+        <div class="stage-title">Candidate Journey</div>
+        <h3 id="sideTitle">Ready to start</h3>
+        <div class="progress-wrap">
+          <div class="progress-meta"><span id="progressLabel">0% complete</span><span id="progressCount">0/0</span></div>
+          <div class="progress-track"><div id="progressFill" class="progress-fill"></div></div>
+        </div>
+        <div class="stat-grid">
+          <div class="stat"><strong id="xpScore">0</strong><span>Quest XP</span></div>
+          <div class="stat"><strong id="signalCount">0</strong><span>Signals captured</span></div>
+        </div>
+        <div class="levels" id="levelList"></div>
+        <p class="small-note" style="margin-top:16px;">Use this as one selection input together with CV, portfolio, interview, and role task. Do not treat it as a formal psychometric assessment.</p>
+      </aside>
+
+      <section class="card" id="screen"></section>
+    </main>
+  </div>
+
+  <canvas id="badgeCanvas" width="1200" height="628" class="hidden"></canvas>
+
+<script>
+const stages = [
+  { id: 'workstyle', title: 'Stage 1 · Workstyle & Execution', short: 'Workstyle' },
+  { id: 'learning', title: 'Stage 2 · Learning Agility', short: 'Learning' },
+  { id: 'collab', title: 'Stage 3 · Collaboration', short: 'Collaboration' },
+  { id: 'rolefit', title: 'Stage 4 · Role Fit Missions', short: 'Role Fit' },
+  { id: 'quality', title: 'Stage 5 · Work Quality', short: 'Quality' },
+  { id: 'values', title: 'Stage 6 · Values & Sustainability', short: 'Values' },
+  { id: 'written', title: 'Stage 7 · Reflection Notes', short: 'Written' },
+  { id: 'results', title: 'Final · Profile Unlocked', short: 'Results' }
+];
+
+const traitInfo = {
+  structured: { label: 'Structured Executor', desc: 'Organised, deadline-aware, and comfortable turning ambiguity into a plan.' },
+  creative: { label: 'Creative Explorer', desc: 'Idea-led, curious, and drawn to angles, hooks, formats, and experimentation.' },
+  connector: { label: 'People Connector', desc: 'Relationship-oriented, attentive to team dynamics, and comfortable coordinating with others.' },
+  ownership: { label: 'Ownership Builder', desc: 'Self-starting, action-oriented, and willing to take responsibility early.' },
+  analytical: { label: 'Analytical Improver', desc: 'Detail-conscious, reflective, and likely to improve systems or work quality.' },
+  purpose: { label: 'Purpose-Driven Contributor', desc: 'Values-led, empathetic, and motivated by meaningful work and responsible conduct.' }
+};
+
+const compInfo = {
+  execution: 'Execution Readiness',
+  learning: 'Learning Agility',
+  communication: 'Communication Maturity',
+  collaboration: 'Collaboration Style',
+  quality: 'Work Quality',
+  ethics: 'Ethical Judgement',
+  sustainability: 'Sustainability Under Pressure'
+};
+
+const roleInfo = {
+  editorial: 'Editorial Assistant',
+  creativeRole: 'Creative Social Media Assistant',
+  bd: 'Business Development Assistant',
+  campaign: 'Campaign Management Assistant'
+};
+
+const feedbackBank = {
+  structured: 'Signal captured: you may prefer clear structure, milestones, and reliable execution.',
+  creative: 'Signal captured: you may be strongest when ideating, reframing, or experimenting with formats.',
+  connector: 'Signal captured: you show a people-aware style that may help with coordination and stakeholder work.',
+  ownership: 'Signal captured: you appear comfortable taking initiative and moving before everything is perfect.',
+  analytical: 'Signal captured: you may naturally analyse, improve, and check details before moving on.',
+  purpose: 'Signal captured: you show values awareness, empathy, or responsible judgement.'
+};
+
+const questions = [
+  {
+    stage:'workstyle', text:'It is Saturday and you have a project due Monday. How do you approach it?',
+    options:[
+      ['A','Break it into steps and start early.',{structured:2,analytical:1,execution:3,quality:1}],
+      ['B','Wait until I feel more mentally ready, then work in one long session.',{creative:1,sustainability:1,execution:1},['delayRisk']],
+      ['C','Ask teammates how they are approaching it before I start.',{connector:2,collaboration:2,communication:1}],
+      ['D','Start with the most interesting part first to build momentum.',{creative:2,ownership:1,execution:1}],
+      ['E','Do the minimum viable version first, then improve if time allows.',{ownership:2,execution:2,sustainability:1}]
+    ]
+  },
+  {
+    stage:'workstyle', text:'Your manager says, “Deliver by Friday. However you want.” What do you do first?',
+    options:[
+      ['A','Clarify the expected outcome, deadline, and format.',{structured:2,communication:3,execution:2,quality:1}],
+      ['B','Start immediately and figure things out along the way.',{ownership:2,learning:1,execution:1}],
+      ['C','Look for examples of similar past work.',{analytical:2,learning:2,quality:1}],
+      ['D','Ask another teammate what the manager usually expects.',{connector:2,communication:1,collaboration:1}],
+      ['E','Create my own version and present it when done.',{creative:2,ownership:1,execution:1},['alignmentRisk']]
+    ]
+  },
+  {
+    stage:'workstyle', text:'You are assigned a task you have never done before. What is your first instinct?',
+    options:[
+      ['A','Search for references and learn the basics first.',{analytical:2,learning:3,quality:1}],
+      ['B','Try it hands-on and learn through mistakes.',{ownership:2,learning:3,execution:1}],
+      ['C','Ask someone to walk me through the first attempt.',{connector:1,communication:2,learning:2}],
+      ['D','Break it into smaller parts and solve one by one.',{structured:2,analytical:1,execution:2}],
+      ['E','Delay slightly until I feel more confident.',{learning:1},['confidenceRisk','delayRisk']]
+    ]
+  },
+  {
+    stage:'workstyle', text:'You are juggling three urgent tasks from different people. What do you do?',
+    options:[
+      ['A','Prioritise by deadline and impact, then update everyone.',{structured:2,communication:2,execution:3,quality:1}],
+      ['B','Work on whichever task was assigned first.',{structured:1,execution:1}],
+      ['C','Ask my manager which one matters most.',{communication:2,execution:2,structured:1}],
+      ['D','Try to complete all at once, even if quality drops.',{ownership:1,execution:1},['qualityRisk','burnoutRisk']],
+      ['E','Focus on the easiest one first to clear my list.',{execution:1},['priorityRisk']]
+    ]
+  },
+  {
+    stage:'workstyle', text:'When you submit work, what best describes you?',
+    options:[
+      ['A','I check details carefully before submitting.',{analytical:2,quality:3,structured:1}],
+      ['B','I submit quickly and expect feedback to refine it.',{ownership:2,learning:1,execution:2}],
+      ['C','I worry too much and may delay submission.',{analytical:1,quality:1},['confidenceRisk','delayRisk']],
+      ['D','I focus more on the idea than formatting/details.',{creative:2},['qualityRisk']],
+      ['E','I ask someone to check before I submit.',{connector:1,communication:1,quality:2}]
+    ]
+  },
+  {
+    stage:'workstyle', text:'A deadline is shortened unexpectedly. You…',
+    options:[
+      ['A','Reprioritise and deliver the most important parts first.',{structured:2,ownership:1,execution:3,sustainability:1}],
+      ['B','Ask for an extension immediately.',{communication:1},['ownershipRisk']],
+      ['C','Work longer hours without changing the plan.',{ownership:1,execution:1},['burnoutRisk','priorityRisk']],
+      ['D','Tell the requester it may not be possible and wait.',{communication:1},['delayRisk']],
+      ['E','Submit a rough version quickly, even if incomplete.',{ownership:1,execution:1},['qualityRisk']]
+    ]
+  },
+  {
+    stage:'workstyle', text:'You notice a process is inefficient. You…',
+    options:[
+      ['A','Suggest a small improvement and test it.',{analytical:2,ownership:2,execution:2,quality:1}],
+      ['B','Document the issue first before suggesting anything.',{structured:2,analytical:2,quality:2}],
+      ['C','Mention it casually to peers.',{connector:1,collaboration:1}],
+      ['D','Ignore it if it is not part of my role.',{},['ownershipRisk']],
+      ['E','Change the process myself without informing anyone.',{ownership:1},['communicationRisk','alignmentRisk']]
+    ]
+  },
+  {
+    stage:'workstyle', text:'Which work environment helps you perform best?',
+    options:[
+      ['A','Clear goals, enough autonomy, and regular check-ins.',{structured:2,ownership:1,communication:1,execution:2}],
+      ['B','Highly structured instructions and close guidance.',{structured:2,learning:1}],
+      ['C','Fast-moving environment with many different tasks.',{ownership:2,creative:1,execution:1}],
+      ['D','Collaborative environment where I can discuss often.',{connector:2,collaboration:2,communication:1}],
+      ['E','Quiet independent work with minimal interruption.',{analytical:1,structured:1,quality:1}]
+    ]
+  },
+  {
+    stage:'learning', text:'You receive several internship rejections. What do you do?',
+    options:[
+      ['A','Review my CV/portfolio and improve specific weak areas.',{analytical:2,learning:3,ownership:1}],
+      ['B','Apply to more roles without changing much.',{ownership:1},['learningRisk']],
+      ['C','Ask for feedback and adjust my approach.',{connector:1,communication:2,learning:3}],
+      ['D','Take a break and restart later with a clearer plan.',{structured:1,sustainability:2,learning:1}],
+      ['E','Feel discouraged and wait for opportunities to come.',{sustainability:1},['resilienceRisk','ownershipRisk']]
+    ]
+  },
+  {
+    stage:'learning', text:'You fail a presentation or task review. What is your next step?',
+    options:[
+      ['A','Analyse what went wrong and prepare a better version.',{analytical:2,learning:3,quality:1}],
+      ['B','Ask for specific feedback from the reviewer.',{communication:2,learning:3,connector:1}],
+      ['C','Avoid similar tasks for now.',{},['resilienceRisk']],
+      ['D','Move on quickly and focus on another task.',{sustainability:1,execution:1},['learningRisk']],
+      ['E','Defend my original work if I believe there is context missing.',{communication:1},['feedbackRisk']]
+    ]
+  },
+  {
+    stage:'learning', text:'A new software replaces a tool you are familiar with. You…',
+    options:[
+      ['A','Experiment immediately and learn by doing.',{ownership:2,learning:3,creative:1}],
+      ['B','Follow official training carefully.',{structured:2,learning:2,quality:1}],
+      ['C','Watch tutorials and compare workflows.',{analytical:2,learning:2}],
+      ['D','Wait for others to learn it first.',{},['learningRisk','delayRisk']],
+      ['E','Use only the functions needed for my work.',{execution:1,structured:1,learning:1}]
+    ]
+  },
+  {
+    stage:'learning', text:'You need to learn something new within one week. You…',
+    options:[
+      ['A','Create a mini learning plan with daily targets.',{structured:2,learning:3,execution:2}],
+      ['B','Ask an experienced person to guide me.',{connector:1,communication:2,learning:2}],
+      ['C','Learn by trying real tasks immediately.',{ownership:2,learning:3,execution:1}],
+      ['D','Watch tutorials first, then practise.',{analytical:1,learning:2,quality:1}],
+      ['E','Read broadly to understand the bigger picture.',{analytical:2,learning:2,creative:1}]
+    ]
+  },
+  {
+    stage:'learning', text:'A project stalls midway. You…',
+    options:[
+      ['A','Break it into smaller milestones and restart.',{structured:2,execution:2,learning:1}],
+      ['B','Ask someone to review what is blocking it.',{connector:1,communication:2,learning:2}],
+      ['C','Revisit the purpose and adjust direction.',{purpose:2,creative:1,learning:1}],
+      ['D','Take a short break, then return with fresh eyes.',{sustainability:2,learning:1}],
+      ['E','Redesign the whole approach from scratch.',{creative:2,ownership:1,learning:1}]
+    ]
+  },
+  {
+    stage:'learning', text:'Company priorities suddenly change. You…',
+    options:[
+      ['A','Ask what has changed and realign my priorities.',{communication:2,structured:1,learning:2,execution:2}],
+      ['B','Look for new opportunities within the change.',{ownership:2,creative:1,learning:2}],
+      ['C','Wait for direct instructions before acting.',{},['ownershipRisk','delayRisk']],
+      ['D','Question the change strongly before moving forward.',{analytical:1,communication:1},['adaptabilityRisk']],
+      ['E','Focus only on my own tasks.',{},['collaborationRisk','adaptabilityRisk']]
+    ]
+  },
+  {
+    stage:'collab', text:'A teammate becomes unusually quiet in meetings. You…',
+    options:[
+      ['A','Check in gently after the meeting.',{connector:2,purpose:1,collaboration:3,communication:2}],
+      ['B','Observe first before deciding whether to act.',{analytical:1,collaboration:1}],
+      ['C','Ask directly in the meeting if something is wrong.',{communication:1},['sensitivityRisk']],
+      ['D','Inform the manager immediately.',{communication:1},['escalationRisk']],
+      ['E','Assume they will speak when ready.',{},['collaborationRisk']]
+    ]
+  },
+  {
+    stage:'collab', text:'Two teammates are in conflict. You…',
+    options:[
+      ['A','Listen to both sides and help calm the situation.',{connector:2,purpose:1,collaboration:3,communication:1}],
+      ['B','Escalate if it affects work or becomes inappropriate.',{communication:2,collaboration:1,ethics:1}],
+      ['C','Investigate the root cause before taking sides.',{analytical:2,collaboration:2,quality:1}],
+      ['D','Stay out unless asked to help.',{},['collaborationRisk']],
+      ['E','Encourage them to discuss openly but respectfully.',{connector:1,communication:2,collaboration:2}]
+    ]
+  },
+  {
+    stage:'collab', text:'In a group discussion, you usually…',
+    options:[
+      ['A','Organise ideas and move the group toward a decision.',{structured:2,execution:2,collaboration:1}],
+      ['B','Offer creative angles or alternative ideas.',{creative:2,collaboration:1}],
+      ['C','Make sure quieter people are heard.',{connector:2,purpose:1,collaboration:2}],
+      ['D','Challenge weak ideas directly.',{analytical:1,communication:1},['sensitivityRisk']],
+      ['E','Support whichever direction the group prefers.',{connector:1,collaboration:1},['passiveRisk']]
+    ]
+  },
+  {
+    stage:'collab', text:'You disagree with your manager’s direction. What do you do?',
+    options:[
+      ['A','Ask clarifying questions and share my concern respectfully.',{communication:3,analytical:1,collaboration:1,ethics:1}],
+      ['B','Follow the direction first and raise concerns later.',{execution:1,collaboration:1}],
+      ['C','Push back strongly if I believe it is wrong.',{communication:1},['sensitivityRisk']],
+      ['D','Ask peers if they also disagree.',{connector:1},['alignmentRisk']],
+      ['E','Keep quiet and do what was assigned.',{execution:1},['communicationRisk']]
+    ]
+  },
+  {
+    stage:'collab', text:'You join a culturally diverse team. You…',
+    options:[
+      ['A','Ask questions and observe team norms.',{connector:1,communication:2,collaboration:2,learning:1}],
+      ['B','Adapt my communication style where needed.',{connector:1,collaboration:2,communication:2}],
+      ['C','Stick to my natural style and let people understand me.',{},['adaptabilityRisk','sensitivityRisk']],
+      ['D','Avoid sensitive topics completely.',{ethics:1},['communicationRisk']],
+      ['E','Wait for others to approach me first.',{},['collaborationRisk']]
+    ]
+  },
+  {
+    stage:'collab', text:'When receiving feedback, you usually…',
+    options:[
+      ['A','Ask what specifically can be improved.',{communication:2,learning:2,quality:2}],
+      ['B','Feel affected at first, then process it.',{sustainability:1,learning:1}],
+      ['C','Defend my reasoning if I think there is context missing.',{communication:1},['feedbackRisk']],
+      ['D','Apply it immediately without much discussion.',{execution:1,learning:1},['clarityRisk']],
+      ['E','Prefer written feedback so I can reflect properly.',{analytical:1,learning:2,quality:1}]
+    ]
+  },
+  {
+    stage:'rolefit', text:'You are asked to support an Editorial article. Which task sounds most natural to you?',
+    options:[
+      ['A','Research facts, sources, and examples.',{analytical:2,quality:2,editorial:3}],
+      ['B','Draft article structure and key points.',{structured:2,editorial:3,execution:1}],
+      ['C','Proofread for clarity, grammar, and flow.',{quality:3,analytical:1,editorial:3}],
+      ['D','Think of a stronger headline or angle.',{creative:2,editorial:2,creativeRole:1}],
+      ['E','Coordinate images, references, and publishing details.',{structured:1,connector:1,editorial:2,campaign:1}]
+    ]
+  },
+  {
+    stage:'rolefit', text:'You are helping create short-form social content. What excites you most?',
+    options:[
+      ['A','Coming up with hooks and video ideas.',{creative:3,creativeRole:3}],
+      ['B','Shooting or editing the content.',{creative:2,ownership:1,creativeRole:3}],
+      ['C','Writing captions and adapting tone.',{creative:1,quality:1,creativeRole:2,editorial:1}],
+      ['D','Studying what performs well and why.',{analytical:2,creativeRole:2,bd:1}],
+      ['E','Coordinating people, timing, and deliverables.',{connector:2,structured:1,campaign:2,creativeRole:1}]
+    ]
+  },
+  {
+    stage:'rolefit', text:'You are supporting a Business Development task. Which part interests you most?',
+    options:[
+      ['A','Researching potential brands or leads.',{analytical:2,bd:3,quality:1}],
+      ['B','Reaching out and starting conversations.',{connector:2,ownership:1,bd:3,communication:1}],
+      ['C','Preparing proposal decks or sales materials.',{structured:1,creative:1,bd:2,quality:1}],
+      ['D','Tracking follow-ups and keeping the pipeline updated.',{structured:2,bd:3,execution:2}],
+      ['E','Understanding what clients need and matching solutions.',{connector:1,analytical:1,bd:3,communication:1}]
+    ]
+  },
+  {
+    stage:'rolefit', text:'You are supporting a Campaign Management task. Which part feels most suitable?',
+    options:[
+      ['A','Keeping timelines and deliverables on track.',{structured:2,campaign:3,execution:2}],
+      ['B','Liaising with creators/KOLs or stakeholders.',{connector:2,campaign:3,communication:1}],
+      ['C','Checking content requirements and details.',{quality:3,campaign:3,analytical:1}],
+      ['D','Solving issues when plans change.',{ownership:2,campaign:2,execution:1}],
+      ['E','Preparing reports and summarising campaign outcomes.',{analytical:2,quality:2,campaign:2,editorial:1}]
+    ]
+  },
+  {
+    stage:'rolefit', text:'A creator/KOL misses a deadline. What do you do first?',
+    options:[
+      ['A','Check the agreed deadline, deliverable, and latest status.',{structured:2,quality:2,campaign:3,communication:1}],
+      ['B','Message them firmly and ask for immediate submission.',{communication:1,campaign:1},['sensitivityRisk']],
+      ['C','Inform the manager and wait for instructions.',{communication:1},['ownershipRisk']],
+      ['D','Suggest an alternative timeline or backup option.',{ownership:2,creative:1,campaign:2,execution:1}],
+      ['E','Assume they are busy and give more time.',{},['priorityRisk','ownershipRisk']]
+    ]
+  },
+  {
+    stage:'rolefit', text:'A client or stakeholder asks for something unclear. You…',
+    options:[
+      ['A','Clarify the request before starting work.',{communication:3,quality:2,campaign:2,bd:1}],
+      ['B','Make a reasonable assumption and proceed quickly.',{ownership:1,execution:1},['alignmentRisk']],
+      ['C','Ask your manager to interpret it.',{communication:1},['confidenceRisk']],
+      ['D','Provide several options for them to choose from.',{creative:1,communication:2,bd:1,campaign:1}],
+      ['E','Delay until they provide more details.',{},['delayRisk']]
+    ]
+  },
+  {
+    stage:'rolefit', text:'You are asked to find 30 potential leads or creators. What matters most?',
+    options:[
+      ['A','Relevance and quality of the list.',{quality:3,analytical:2,bd:2,campaign:1}],
+      ['B','Completing the full number as fast as possible.',{execution:1},['qualityRisk']],
+      ['C','Clear notes, links, and status tracking.',{structured:2,quality:2,bd:2,campaign:1}],
+      ['D','Finding unusual or creative options others may miss.',{creative:2,bd:1,creativeRole:1}],
+      ['E','Asking for examples before starting.',{communication:2,learning:1,quality:1}]
+    ]
+  },
+  {
+    stage:'rolefit', text:'Which internship task would drain you the most?',
+    options:[
+      ['A','Repetitive data entry and tracking.',{creative:1},['campaignCaution','bdCaution']],
+      ['B','Cold outreach or follow-ups.',{analytical:1},['bdCaution']],
+      ['C','Writing or research-heavy work.',{connector:1},['editorialCaution']],
+      ['D','Fast changes and unclear instructions.',{structured:1},['campaignCaution','creativeCaution']],
+      ['E','Being on camera or involved in shoots.',{analytical:1},['creativeCaution']]
+    ]
+  },
+  {
+    stage:'quality', text:'You realise after submitting work that there is a mistake. You…',
+    options:[
+      ['A','Inform the person quickly and send a corrected version.',{communication:2,quality:3,ethics:2,ownership:1}],
+      ['B','Quietly fix it if possible.',{quality:1},['communicationRisk']],
+      ['C','Wait to see if anyone notices.',{},['ethicsRisk','ownershipRisk']],
+      ['D','Explain why the mistake happened before correcting it.',{communication:1},['accountabilityRisk']],
+      ['E','Ask someone else whether it is serious.',{communication:1,learning:1},['confidenceRisk']]
+    ]
+  },
+  {
+    stage:'quality', text:'You are unclear about a task but the requester looks busy. You…',
+    options:[
+      ['A','Prepare specific questions and ask efficiently.',{communication:3,quality:2,structured:1}],
+      ['B','Guess based on context and proceed.',{ownership:1},['alignmentRisk','qualityRisk']],
+      ['C','Wait until they are free, even if it delays work.',{},['delayRisk']],
+      ['D','Ask another teammate first.',{connector:1,communication:1,learning:1}],
+      ['E','Send a draft early and ask if you are on the right track.',{ownership:1,communication:2,learning:1,quality:1}]
+    ]
+  },
+  {
+    stage:'quality', text:'Which statement sounds most like your working style?',
+    options:[
+      ['A','I prefer clear expectations and then I execute independently.',{structured:2,ownership:1,execution:2}],
+      ['B','I work best when I can discuss ideas often.',{connector:2,collaboration:2,communication:1}],
+      ['C','I need structure, especially when something is new.',{structured:2,learning:1}],
+      ['D','I enjoy figuring things out even when messy.',{ownership:2,creative:1,learning:1}],
+      ['E','I prefer tasks with visible outcomes and impact.',{purpose:2,execution:1,ownership:1}]
+    ]
+  },
+  {
+    stage:'quality', text:'You are asked to summarise a meeting. What do you focus on?',
+    options:[
+      ['A','Key decisions, action items, owners, and deadlines.',{structured:2,quality:3,execution:2,campaign:1}],
+      ['B','Everything that was discussed in detail.',{analytical:1,quality:1},['prioritisationRisk']],
+      ['C','The overall mood and concerns raised.',{connector:2,collaboration:1}],
+      ['D','The strategic implications of the discussion.',{analytical:2,creative:1}],
+      ['E','The parts relevant to my own task only.',{execution:1},['collaborationRisk']]
+    ]
+  },
+  {
+    stage:'quality', text:'You are given a repetitive task. You…',
+    options:[
+      ['A','Complete it accurately and look for ways to improve the process.',{quality:3,analytical:2,ownership:1}],
+      ['B','Complete it but may lose motivation quickly.',{execution:1},['sustainabilityRisk']],
+      ['C','Ask why the task matters before doing it.',{purpose:1,communication:1}],
+      ['D','Try to automate or simplify it.',{analytical:2,creative:1,ownership:1}],
+      ['E','Rush through it to get to more interesting work.',{},['qualityRisk']]
+    ]
+  },
+  {
+    stage:'quality', text:'Someone gives you vague feedback: “This needs to be better.” You…',
+    options:[
+      ['A','Ask which part needs improvement and what good looks like.',{communication:3,learning:2,quality:2}],
+      ['B','Redo it completely.',{ownership:1},['clarityRisk']],
+      ['C','Make small edits and resubmit.',{execution:1},['learningRisk']],
+      ['D','Ask someone else to interpret the feedback.',{connector:1,communication:1}],
+      ['E','Feel frustrated but try again later.',{sustainability:1},['delayRisk','feedbackRisk']]
+    ]
+  },
+  {
+    stage:'values', text:'You discover a loophole that benefits you but may be unethical. You…',
+    options:[
+      ['A','Seek advice or report it through the right channel.',{ethics:3,communication:1,purpose:2}],
+      ['B','Avoid using it quietly.',{ethics:2,purpose:1}],
+      ['C','Use it if no one is harmed.',{},['ethicsRisk']],
+      ['D','Wait to see if others use it.',{},['ethicsRisk','passiveRisk']],
+      ['E','Ignore it and move on.',{},['ethicsRisk','ownershipRisk']]
+    ]
+  },
+  {
+    stage:'values', text:'A colleague shares a sensitive personal issue affecting work. You…',
+    options:[
+      ['A','Listen respectfully and keep confidence where appropriate.',{purpose:2,collaboration:2,ethics:2}],
+      ['B','Suggest practical next steps or support.',{connector:1,communication:1,collaboration:1}],
+      ['C','Encourage them to speak to HR/manager if work is affected.',{ethics:2,communication:2,collaboration:1}],
+      ['D','Distance myself to stay objective.',{ethics:1},['collaborationRisk']],
+      ['E','Tell others only if I think they should know.',{},['confidentialityRisk','ethicsRisk']]
+    ]
+  },
+  {
+    stage:'values', text:'A strong-brand company offers you a role, but the culture feels overly competitive and the product does not align with your values. You…',
+    options:[
+      ['A','Ask more questions before deciding.',{analytical:2,communication:1,ethics:1,learning:1}],
+      ['B','Take it because the brand will help my career.',{ownership:1},['valuesCaution']],
+      ['C','Decline if the values mismatch is serious.',{purpose:2,ethics:1}],
+      ['D','Accept and give it six months.',{ownership:1,learning:1}],
+      ['E','Focus only on the work and ignore the rest.',{execution:1},['valuesCaution','sustainabilityRisk']]
+    ]
+  },
+  {
+    stage:'values', text:'Your ideal first year after university would be…',
+    options:[
+      ['A','Clear growth, stronger skills, and visible progress.',{ownership:1,structured:1,learning:2}],
+      ['B','A strong portfolio and transferable skills.',{ownership:1,creative:1,learning:2}],
+      ['C','Meaningful work that aligns with my values.',{purpose:3,ethics:1}],
+      ['D','Balanced schedule with room for life outside work.',{sustainability:3}],
+      ['E','Exploring different paths without pressure.',{creative:1,learning:1,sustainability:1}]
+    ]
+  },
+  {
+    stage:'values', text:'During a high-pressure launch, your energy is consistently low. You…',
+    options:[
+      ['A','Optimise my schedule and protect essential rest.',{sustainability:3,structured:1,execution:1}],
+      ['B','Push through until the launch ends.',{execution:1,ownership:1},['burnoutRisk']],
+      ['C','Inform my manager early before quality drops.',{communication:2,sustainability:2,quality:1}],
+      ['D','Reflect whether this intensity suits me long-term.',{purpose:1,sustainability:2}],
+      ['E','Accept it as part of working life.',{execution:1},['burnoutRisk']]
+    ]
+  },
+  {
+    stage:'values', text:'Ten years from now, which outcome would feel most satisfying?',
+    options:[
+      ['A','I am recognised for strong career achievements.',{ownership:2,execution:1}],
+      ['B','I have flexibility and a lifestyle I enjoy.',{sustainability:3}],
+      ['C','I have created or built something of my own.',{creative:1,ownership:3}],
+      ['D','I am doing meaningful work that helps others.',{purpose:3,ethics:1}],
+      ['E','I am still learning, exploring, and evolving.',{creative:1,learning:2}]
+    ]
+  }
+].map((q, i) => ({...q, id: i + 1, options: q.options.map(o => ({ label:o[0], text:o[1], scores:o[2] || {}, flags:o[3] || [] })) }));
+
+const writtenPrompts = [
+  { id:'proudProject', label:'Tell us about one project, assignment, campaign, event, or content piece you are proud of. What was your role, and what made it successful?' },
+  { id:'feedbackMoment', label:'Describe a time you received difficult feedback. What did you do after receiving it?' },
+  { id:'roleInterest', label:'Which internship role are you most interested in, and why?' },
+  { id:'managerStyle', label:'What type of manager or working environment helps you do your best work?' },
+  { id:'portfolioNote', label:'Is there anything in your CV, portfolio, or background that you would like us to pay special attention to?' }
+];
+
+const state = {
+  screen: 'intro',
+  current: 0,
+  candidate: {},
+  answers: [],
+  written: {},
+  startedAt: null,
+  completedAt: null
+};
+
+const screen = document.getElementById('screen');
+const progressFill = document.getElementById('progressFill');
+const progressLabel = document.getElementById('progressLabel');
+const progressCount = document.getElementById('progressCount');
+const xpScore = document.getElementById('xpScore');
+const signalCount = document.getElementById('signalCount');
+const levelList = document.getElementById('levelList');
+const sideTitle = document.getElementById('sideTitle');
+
+function initLevels() {
+  levelList.innerHTML = stages.map(s => `<div class="level" id="level-${s.id}"><span>◆</span><span>${s.short}</span></div>`).join('');
+}
+
+function updateSidebar() {
+  const answered = state.answers.length;
+  const total = questions.length + writtenPrompts.length;
+  const pct = Math.round((answered / total) * 100);
+  progressFill.style.width = pct + '%';
+  progressLabel.textContent = `${pct}% complete`;
+  progressCount.textContent = `${answered}/${total}`;
+  xpScore.textContent = String(answered * 120);
+  signalCount.textContent = String(answered);
+  const currentStage = state.screen === 'quiz' ? questions[state.current]?.stage : state.screen;
+  const currentStageObj = stages.find(s => s.id === currentStage) || stages[0];
+  sideTitle.textContent = currentStageObj.title || 'Intern Quest';
+
+  stages.forEach(s => {
+    const el = document.getElementById(`level-${s.id}`);
+    if (!el) return;
+    el.classList.remove('active','done');
+    const stageQuestions = questions.filter(q => q.stage === s.id);
+    if (s.id === 'written') {
+      if (state.screen === 'written') el.classList.add('active');
+      if (state.screen === 'results') el.classList.add('done');
+    } else if (s.id === 'results') {
+      if (state.screen === 'results') el.classList.add('active');
+    } else if (stageQuestions.length) {
+      const allDone = stageQuestions.every(q => state.answers.some(a => a.qid === q.id));
+      if (allDone) el.classList.add('done');
+      if (currentStage === s.id && !allDone) el.classList.add('active');
+    }
+  });
+}
+
+function renderIntro() {
+  state.screen = 'intro';
+  updateSidebar();
+  screen.innerHTML = `
+    <div class="hero-grid">
+      <div>
+        <div class="stage-title">Prototype v1</div>
+        <h1>Turn intern selection into a quest.</h1>
+        <p>This interactive HTML game captures practical hiring signals across workstyle, learning agility, communication, role fit, work quality, ethics, and sustainability. Candidates complete scenario choices and reflection prompts. HR gets a downloadable assessment summary.</p>
+        <div class="pill-grid">
+          <span class="pill">40 scenarios</span>
+          <span class="pill">5 written responses</span>
+          <span class="pill">4 role-fit scores</span>
+          <span class="pill">6 archetype profiles</span>
+          <span class="pill">Badge download</span>
+          <span class="pill">HR report download</span>
+        </div>
+        <div class="btn-row">
+          <button class="btn" onclick="renderCandidateForm()">Start Quest</button>
+          <button class="btn secondary" onclick="renderHowItWorks()">How scoring works</button>
+        </div>
+        <p class="small-note">Privacy note: this prototype intentionally avoids NRIC/passport and date of birth. Collect those only later if needed for offer/onboarding documentation.</p>
+      </div>
+      <div class="hero-visual">
+        <div class="quest-map">
+          <div class="map-node"><div class="node-badge">1</div><div><strong>Workstyle</strong><br><span class="muted">Task ownership and ambiguity</span></div></div>
+          <div class="map-node"><div class="node-badge">2</div><div><strong>Learning</strong><br><span class="muted">Adaptability and resilience</span></div></div>
+          <div class="map-node"><div class="node-badge">3</div><div><strong>Collaboration</strong><br><span class="muted">Team and manager communication</span></div></div>
+          <div class="map-node"><div class="node-badge">4</div><div><strong>Role Missions</strong><br><span class="muted">Editorial, Creative, BD, Campaign fit</span></div></div>
+          <div class="map-node"><div class="node-badge">★</div><div><strong>Profile Unlock</strong><br><span class="muted">HR summary + candidate badge</span></div></div>
+        </div>
+      </div>
+    </div>`;
+}
+
+function renderHowItWorks() {
+  state.screen = 'intro';
+  updateSidebar();
+  screen.innerHTML = `
+    <div class="stage-title">Assessment Design</div>
+    <h2>How this game supports intern selection</h2>
+    <p>Each option maps to a few internal signals. It does not simply count A/B/C/D/E. That makes the profile more useful and prevents the original quiz problem where the same letter meant different things across questions.</p>
+    <div class="result-grid">
+      <div class="result-card">
+        <h3>Profile signals</h3>
+        <p>Structured Executor, Creative Explorer, People Connector, Ownership Builder, Analytical Improver, Purpose-Driven Contributor.</p>
+      </div>
+      <div class="result-card">
+        <h3>Competency signals</h3>
+        <p>Execution, learning, communication, collaboration, quality, ethics, and sustainability.</p>
+      </div>
+      <div class="result-card">
+        <h3>Role-fit signals</h3>
+        <p>Editorial Assistant, Creative Social Media Assistant, Business Development Assistant, and Campaign Management Assistant.</p>
+      </div>
+      <div class="result-card">
+        <h3>Review flags</h3>
+        <p>Flags are not automatic rejection reasons. They become interview probes, such as detail risk, feedback risk, burnout risk, or role mismatch.</p>
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="btn" onclick="renderCandidateForm()">Start Quest</button>
+      <button class="btn secondary" onclick="renderIntro()">Back</button>
+    </div>`;
+}
+
+function renderCandidateForm() {
+  state.screen = 'candidate';
+  updateSidebar();
+  screen.innerHTML = `
+    <div class="stage-title">Candidate Setup</div>
+    <h2>Before the quest begins</h2>
+    <p>Collect only what HR needs to assess internship fit at this stage. Avoid highly sensitive identifiers unless the candidate reaches offer/onboarding stage.</p>
+    <div class="form-grid">
+      <div class="field"><label>Full name *</label><input id="fullName" placeholder="Candidate name" /></div>
+      <div class="field"><label>Email *</label><input id="email" type="email" placeholder="name@email.com" /></div>
+      <div class="field"><label>Mobile number</label><input id="mobile" placeholder="Optional" /></div>
+      <div class="field"><label>University / college</label><input id="school" placeholder="Optional" /></div>
+      <div class="field"><label>Course / major</label><input id="course" placeholder="Optional" /></div>
+      <div class="field"><label>Internship availability</label><input id="availability" placeholder="e.g. Jan–Jun 2027" /></div>
+      <div class="field"><label>Primary role interest</label>
+        <select id="rolePreference">
+          <option value="Open">Open to more than one role</option>
+          <option value="Editorial Assistant">Editorial Assistant</option>
+          <option value="Creative Social Media Assistant">Creative Social Media Assistant</option>
+          <option value="Business Development Assistant">Business Development Assistant</option>
+          <option value="Campaign Management Assistant">Campaign Management Assistant</option>
+        </select>
+      </div>
+      <div class="field"><label>Portfolio / LinkedIn link</label><input id="portfolio" placeholder="Optional URL" /></div>
+    </div>
+    <div class="consent-box">
+      <input id="consent" type="checkbox" />
+      <label for="consent">I understand this assessment is used to support internship selection together with CV, portfolio, interview and role requirements. I will answer honestly.</label>
+    </div>
+    <div class="btn-row">
+      <button class="btn" onclick="startQuiz()">Enter Stage 1</button>
+      <button class="btn secondary" onclick="renderIntro()">Back</button>
+    </div>`;
+}
+
+function startQuiz() {
+  const fullName = document.getElementById('fullName').value.trim();
+  const email = document.getElementById('email').value.trim();
+  const consent = document.getElementById('consent').checked;
+  if (!fullName || !email || !consent) {
+    alert('Please complete full name, email, and consent before starting.');
+    return;
+  }
+  state.candidate = {
+    fullName,
+    email,
+    mobile: document.getElementById('mobile').value.trim(),
+    school: document.getElementById('school').value.trim(),
+    course: document.getElementById('course').value.trim(),
+    availability: document.getElementById('availability').value.trim(),
+    rolePreference: document.getElementById('rolePreference').value,
+    portfolio: document.getElementById('portfolio').value.trim()
+  };
+  state.startedAt = new Date().toISOString();
+  state.screen = 'quiz';
+  state.current = 0;
+  renderQuestion();
+}
+
+function renderQuestion(selectedIndex = null) {
+  state.screen = 'quiz';
+  const q = questions[state.current];
+  updateSidebar();
+  const stageObj = stages.find(s => s.id === q.stage);
+  screen.innerHTML = `
+    <div class="question-card">
+      <div>
+        <div class="question-number">${stageObj.title} · Question ${state.current + 1} of ${questions.length}</div>
+        <div class="question-text">${q.text}</div>
+      </div>
+      <div class="options">
+        ${q.options.map((o, idx) => `
+          <button class="option ${selectedIndex === idx ? 'selected' : ''}" onclick="selectOption(${idx})">
+            <span class="option-letter">${o.label}</span>
+            <span class="option-text">${o.text}</span>
+          </button>
+        `).join('')}
+      </div>
+      <div id="microFeedback" class="micro-feedback"></div>
+      <div class="btn-row">
+        <button class="btn secondary" onclick="saveAndNext(true)" ${state.current === 0 ? 'disabled' : ''}>Previous</button>
+        <button class="btn" id="nextBtn" onclick="saveAndNext(false)" disabled>${state.current === questions.length - 1 ? 'Go to Reflection Notes' : 'Lock Answer & Continue'}</button>
+      </div>
+    </div>`;
+}
+
+let pendingSelection = null;
+function selectOption(idx) {
+  pendingSelection = idx;
+  const q = questions[state.current];
+  document.querySelectorAll('.option').forEach((el, i) => el.classList.toggle('selected', i === idx));
+  document.getElementById('nextBtn').disabled = false;
+  const topSignal = Object.keys(q.options[idx].scores).find(k => traitInfo[k]) || 'structured';
+  const fb = feedbackBank[topSignal] || 'Signal captured: this choice will help HR understand your working style.';
+  const flags = q.options[idx].flags || [];
+  const flagNote = flags.length ? ' HR may use this as an interview probe, not an automatic rejection signal.' : '';
+  const box = document.getElementById('microFeedback');
+  box.innerHTML = `<strong>${fb}</strong><br><span class="small-note">${flagNote || 'No answer is treated as a universal “perfect” answer.'}</span>`;
+  box.classList.add('show');
+}
+
+function saveAndNext(previous) {
+  if (previous) {
+    if (state.current > 0) state.current--;
+    pendingSelection = null;
+    renderQuestion();
+    return;
+  }
+  if (pendingSelection === null) return;
+  const q = questions[state.current];
+  const selected = q.options[pendingSelection];
+  const existingIndex = state.answers.findIndex(a => a.qid === q.id);
+  const answerPayload = { qid:q.id, question:q.text, stage:q.stage, label:selected.label, answer:selected.text, scores:selected.scores, flags:selected.flags };
+  if (existingIndex >= 0) state.answers[existingIndex] = answerPayload;
+  else state.answers.push(answerPayload);
+  pendingSelection = null;
+  if (state.current < questions.length - 1) {
+    state.current++;
+    renderQuestion();
+  } else {
+    renderWritten();
+  }
+}
+
+function renderWritten() {
+  state.screen = 'written';
+  updateSidebar();
+  screen.innerHTML = `
+    <div class="stage-title">Stage 7 · Reflection Notes</div>
+    <h2>Final reflection</h2>
+    <p>These written responses help HR and Hiring Managers assess communication quality, self-awareness, and actual role motivation. Short and specific is better than long and generic.</p>
+    <div class="form-grid">
+      ${writtenPrompts.map(p => `
+        <div class="field full">
+          <label>${p.label}</label>
+          <textarea id="${p.id}" placeholder="Write your response here...">${state.written[p.id] || ''}</textarea>
+        </div>
+      `).join('')}
+    </div>
+    <div class="btn-row">
+      <button class="btn success" onclick="completeAssessment()">Unlock Profile</button>
+    </div>`;
+}
+
+function completeAssessment() {
+  writtenPrompts.forEach(p => state.written[p.id] = document.getElementById(p.id).value.trim());
+  // Count written responses as completion signals.
+  writtenPrompts.forEach(p => {
+    if (!state.answers.some(a => a.qid === p.id)) {
+      state.answers.push({ qid:p.id, question:p.label, stage:'written', label:'WRITTEN', answer:state.written[p.id] || '[Blank]', scores:{}, flags: state.written[p.id] ? [] : ['writtenGap'] });
+    }
+  });
+  state.completedAt = new Date().toISOString();
+  renderResults();
+}
+
+function getScores() {
+  const raw = {};
+  const flags = {};
+  const selectedAnswers = state.answers.filter(a => typeof a.qid === 'number');
+  selectedAnswers.forEach(a => {
+    Object.entries(a.scores || {}).forEach(([k,v]) => raw[k] = (raw[k] || 0) + v);
+    (a.flags || []).forEach(f => flags[f] = (flags[f] || 0) + 1);
+  });
+  // Written quality heuristic: practical scoring based on response length and specificity markers.
+  let writtenQuality = 0;
+  Object.values(state.written).forEach(txt => {
+    const len = (txt || '').trim().split(/\s+/).filter(Boolean).length;
+    if (len >= 35) writtenQuality += 2;
+    else if (len >= 15) writtenQuality += 1;
+    if (/\b(i|my|me|led|created|improved|learnt|learned|feedback|result|because|therefore|deadline|client|team|campaign|content|research|portfolio)\b/i.test(txt)) writtenQuality += 1;
+  });
+  raw.communication = (raw.communication || 0) + Math.min(8, writtenQuality);
+  raw.quality = (raw.quality || 0) + Math.min(6, writtenQuality);
+
+  const traitKeys = Object.keys(traitInfo);
+  const compKeys = Object.keys(compInfo);
+  const roleKeys = Object.keys(roleInfo);
+  const traits = Object.fromEntries(traitKeys.map(k => [k, raw[k] || 0]));
+  const comps = Object.fromEntries(compKeys.map(k => [k, raw[k] || 0]));
+  const roles = Object.fromEntries(roleKeys.map(k => [k, raw[k] || 0]));
+
+  const normalize = obj => {
+    const values = Object.values(obj);
+    const max = Math.max(...values, 1);
+    const min = Math.min(...values, 0);
+    return Object.fromEntries(Object.entries(obj).map(([k,v]) => [k, Math.round(((v - min) / Math.max(max - min, 1)) * 100)]));
+  };
+
+  return { raw, flags, traits, comps, roles, traitPct: normalize(traits), compPct: normalize(comps), rolePct: normalize(roles) };
+}
+
+function topEntries(obj, n = 3) {
+  return Object.entries(obj).sort((a,b) => b[1] - a[1]).slice(0,n);
+}
+
+function band(score) {
+  if (score >= 80) return 'High';
+  if (score >= 55) return 'Medium';
+  return 'Low';
+}
+
+function concernText(flags) {
+  const map = {
+    qualityRisk:'May rush or under-check details; validate work quality expectations.',
+    delayRisk:'May delay action when uncertain; probe how they manage ambiguity.',
+    ownershipRisk:'May wait for direction; clarify level of initiative required.',
+    burnoutRisk:'May push through pressure without adjusting workload sustainably.',
+    communicationRisk:'May under-communicate issues or changes.',
+    feedbackRisk:'May need support receiving and applying feedback constructively.',
+    ethicsRisk:'Ethical judgement should be probed carefully in interview.',
+    confidentialityRisk:'Confidentiality judgement requires follow-up.',
+    alignmentRisk:'May act before confirming expected outcome; probe brief-handling habits.',
+    collaborationRisk:'May be less proactive in team-dynamic situations.',
+    bdCaution:'Potential mismatch with BD outreach, tracking, or follow-up work.',
+    campaignCaution:'Potential mismatch with repetitive tracking or fast-changing campaign work.',
+    editorialCaution:'Potential mismatch with writing/research-heavy work.',
+    creativeCaution:'Potential mismatch with shoots, fast creative changes, or content production.'
+  };
+  return Object.entries(flags).sort((a,b) => b[1]-a[1]).slice(0,5).map(([f,count]) => `${map[f] || f} (${count})`);
+}
+
+function roleReason(roleKey, scores) {
+  const pct = scores.rolePct[roleKey] || 0;
+  const label = roleInfo[roleKey];
+  if (roleKey === 'editorial') {
+    return pct >= 80 ? 'Strong research, writing, clarity, or detail-orientation signals.' : pct >= 55 ? 'Some editorial-adjacent signals; validate writing quality and patience for research.' : 'Limited editorial signal; assess via writing sample if still interested.';
+  }
+  if (roleKey === 'creativeRole') {
+    return pct >= 80 ? 'Strong content ideation, production, or performance-curiosity signals.' : pct >= 55 ? 'Some creative signal; validate portfolio and execution discipline.' : 'Limited creative production signal; portfolio check is important.';
+  }
+  if (roleKey === 'bd') {
+    return pct >= 80 ? 'Strong lead research, outreach, client-needs, or pipeline-discipline signals.' : pct >= 55 ? 'Some BD signal; probe comfort with follow-ups and rejection.' : 'Limited BD signal; may not enjoy outreach or pipeline work.';
+  }
+  if (roleKey === 'campaign') {
+    return pct >= 80 ? 'Strong coordination, timeline, stakeholder, and detail-management signals.' : pct >= 55 ? 'Some campaign signal; validate comfort with fast changes and KOL follow-ups.' : 'Limited campaign coordination signal; may need close guidance.';
+  }
+  return label;
+}
+
+function recommendation(scores) {
+  const compAverage = Math.round(Object.values(scores.compPct).reduce((a,b)=>a+b,0) / Object.values(scores.compPct).length);
+  const flagWeight = Object.entries(scores.flags).reduce((acc,[k,v]) => acc + (['ethicsRisk','confidentialityRisk'].includes(k) ? v*8 : v*3), 0);
+  const adjusted = Math.max(0, Math.min(100, compAverage - flagWeight + 10));
+  if (adjusted >= 80) return ['Strong Fit', 'Proceed with priority interview / HM review.'];
+  if (adjusted >= 65) return ['Good Potential', 'Proceed to interview; validate flagged areas and role-specific interest.'];
+  if (adjusted >= 50) return ['Mixed Fit', 'Consider only if CV/portfolio/task is strong or role need matches profile.'];
+  return ['Not Recommended Yet', 'May not be ready for current intake without stronger evidence from CV, portfolio, or task.'];
+}
+
+function renderResults() {
+  state.screen = 'results';
+  updateSidebar();
+  const scores = getScores();
+  const topTrait = topEntries(scores.traits, 1)[0]?.[0] || 'structured';
+  const topTraitInfo = traitInfo[topTrait];
+  const roleRows = Object.keys(roleInfo).map(k => {
+    const pct = scores.rolePct[k] || 0;
+    return `<tr><td>${roleInfo[k]}</td><td><strong class="${pct >= 80 ? 'success' : pct < 55 ? 'danger-text' : 'accent'}">${band(pct)}</strong><br><span class="small-note">${pct}% relative signal</span></td><td>${roleReason(k, scores)}</td></tr>`;
+  }).join('');
+  const concerns = concernText(scores.flags);
+  const [recBand, recText] = recommendation(scores);
+
+  screen.innerHTML = `
+    <div class="stage-title">Profile Unlocked</div>
+    <h2>${state.candidate.fullName}'s Intern Quest Scorecard</h2>
+    <p>This result is a structured assessment support summary. Use it with CV, portfolio, interview notes, and any role-based task.</p>
+
+    <div class="result-grid">
+      <div class="result-card">
+        <h3>Primary Workstyle Profile</h3>
+        <p><strong class="accent">${topTraitInfo.label}</strong></p>
+        <p>${topTraitInfo.desc}</p>
+        <div class="pill-grid">${topEntries(scores.traits, 3).map(([k,v]) => `<span class="pill">${traitInfo[k].label}: ${v}</span>`).join('')}</div>
+      </div>
+      <div class="result-card">
+        <h3>HR Recommendation</h3>
+        <p><strong class="${recBand === 'Strong Fit' ? 'success' : recBand === 'Not Recommended Yet' ? 'danger-text' : 'accent'}">${recBand}</strong></p>
+        <p>${recText}</p>
+        <p class="small-note">This recommendation is generated from scenario choices and written-response completeness. It should not be used as the sole selection basis.</p>
+      </div>
+    </div>
+
+    <div class="result-grid">
+      <div class="result-card">
+        <h3>Competency Signals</h3>
+        ${Object.entries(compInfo).map(([k,label]) => bar(label, scores.compPct[k] || 0)).join('')}
+      </div>
+      <div class="result-card">
+        <h3>Candidate Badge Preview</h3>
+        <div class="badge-preview" id="badgePreview">
+          <div><div class="small">TSLMY Intern Quest</div><div class="big">${topTraitInfo.label}</div></div>
+          <div class="foot"><span>${state.candidate.fullName}</span><span>${new Date().getFullYear()}</span></div>
+        </div>
+        <div class="btn-row">
+          <button class="btn success" onclick="downloadBadge()">Download Badge PNG</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="result-card" style="margin-top:16px;">
+      <h3>Role Match Matrix</h3>
+      <table class="summary-table">
+        <thead><tr><th>Role</th><th>Fit</th><th>Reason</th></tr></thead>
+        <tbody>${roleRows}</tbody>
+      </table>
+    </div>
+
+    <div class="result-grid">
+      <div class="result-card">
+        <h3>Possible Concerns / Interview Probes</h3>
+        ${concerns.length ? `<ul>${concerns.map(c => `<li>${c}</li>`).join('')}</ul>` : '<p>No major caution flags captured. Still validate with interview and task evidence.</p>'}
+      </div>
+      <div class="result-card">
+        <h3>Suggested Interview Probes</h3>
+        <ol>
+          <li>Walk me through a project where you had to manage unclear instructions. What did you clarify first?</li>
+          <li>Tell me about feedback you received that changed the way you worked.</li>
+          <li>Which part of this internship do you think will be hardest for you, and how would you manage it?</li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn" onclick="downloadReport()">Download HR Report</button>
+      <button class="btn secondary" onclick="downloadCSV()">Download CSV Row</button>
+      <button class="btn secondary" onclick="restartAssessment()">Restart Prototype</button>
+    </div>`;
+}
+
+function bar(label, value) {
+  return `<div class="bar"><div class="bar-label"><span>${label}</span><span>${value}%</span></div><div class="bar-track"><div class="bar-fill" style="width:${value}%"></div></div></div>`;
+}
+
+function buildReportText() {
+  const scores = getScores();
+  const topTrait = topEntries(scores.traits, 1)[0]?.[0] || 'structured';
+  const topTraitInfo = traitInfo[topTrait];
+  const concerns = concernText(scores.flags);
+  const [recBand, recText] = recommendation(scores);
+  const roleLines = Object.keys(roleInfo).map(k => `- ${roleInfo[k]}: ${band(scores.rolePct[k] || 0)} (${scores.rolePct[k] || 0}%) — ${roleReason(k, scores)}`).join('\n');
+  const compLines = Object.entries(compInfo).map(([k,label]) => `- ${label}: ${scores.compPct[k] || 0}%`).join('\n');
+  const writtenLines = writtenPrompts.map(p => `\n${p.label}\n${state.written[p.id] || '[Blank]'}`).join('\n');
+  return `TSLMY INTERN QUEST ASSESSMENT — HR SUMMARY
+
+Candidate: ${state.candidate.fullName}
+Email: ${state.candidate.email}
+Mobile: ${state.candidate.mobile || '-'}
+School: ${state.candidate.school || '-'}
+Course: ${state.candidate.course || '-'}
+Availability: ${state.candidate.availability || '-'}
+Role Preference: ${state.candidate.rolePreference || '-'}
+Portfolio/LinkedIn: ${state.candidate.portfolio || '-'}
+Started: ${state.startedAt || '-'}
+Completed: ${state.completedAt || '-'}
+
+OVERALL RECOMMENDATION
+${recBand} — ${recText}
+
+PRIMARY WORKSTYLE PROFILE
+${topTraitInfo.label}: ${topTraitInfo.desc}
+Top signals: ${topEntries(scores.traits, 3).map(([k,v]) => `${traitInfo[k].label} (${v})`).join(', ')}
+
+COMPETENCY SIGNALS
+${compLines}
+
+ROLE MATCH
+${roleLines}
+
+POSSIBLE CONCERNS / INTERVIEW PROBES
+${concerns.length ? concerns.map(c => '- ' + c).join('\n') : '- No major caution flags captured. Validate with interview and task evidence.'}
+
+SUGGESTED INTERVIEW QUESTIONS
+1. Walk me through a project where you had to manage unclear instructions. What did you clarify first?
+2. Tell me about feedback you received that changed the way you worked.
+3. Which part of this internship do you think will be hardest for you, and how would you manage it?
+
+WRITTEN RESPONSES
+${writtenLines}
+
+RAW SELECTED ANSWERS
+${state.answers.filter(a => typeof a.qid === 'number').map(a => `${a.qid}. ${a.question}\nAnswer ${a.label}: ${a.answer}`).join('\n\n')}
+
+Note: This tool is intended to support intern selection together with CV, portfolio, interviews, and role tasks. It is not a standalone psychometric assessment.`;
+}
+
+function downloadText(filename, text, type = 'text/plain') {
+  const blob = new Blob([text], { type });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(a.href);
+}
+
+function cleanName(name) {
+  return (name || 'candidate').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'') || 'candidate';
+}
+
+function downloadReport() {
+  downloadText(`intern-quest-hr-report-${cleanName(state.candidate.fullName)}.txt`, buildReportText());
+}
+
+function csvEscape(value) {
+  return '"' + String(value ?? '').replace(/"/g,'""') + '"';
+}
+
+function downloadCSV() {
+  const scores = getScores();
+  const [recBand, recText] = recommendation(scores);
+  const headers = ['fullName','email','mobile','school','course','availability','rolePreference','portfolio','recommendation','recommendationText','primaryProfile',...Object.values(compInfo),...Object.values(roleInfo)];
+  const topTrait = topEntries(scores.traits,1)[0]?.[0] || 'structured';
+  const row = [state.candidate.fullName,state.candidate.email,state.candidate.mobile,state.candidate.school,state.candidate.course,state.candidate.availability,state.candidate.rolePreference,state.candidate.portfolio,recBand,recText,traitInfo[topTrait].label,...Object.keys(compInfo).map(k => scores.compPct[k] || 0),...Object.keys(roleInfo).map(k => scores.rolePct[k] || 0)];
+  downloadText(`intern-quest-row-${cleanName(state.candidate.fullName)}.csv`, headers.map(csvEscape).join(',') + '\n' + row.map(csvEscape).join(','), 'text/csv');
+}
+
+function downloadBadge() {
+  const scores = getScores();
+  const topTrait = topEntries(scores.traits, 1)[0]?.[0] || 'structured';
+  const topTraitInfo = traitInfo[topTrait];
+  const canvas = document.getElementById('badgeCanvas');
+  const ctx = canvas.getContext('2d');
+  const w = canvas.width, h = canvas.height;
+  const grad = ctx.createLinearGradient(0,0,w,h);
+  grad.addColorStop(0,'#ffcf33');
+  grad.addColorStop(.56,'#ff8a3d');
+  grad.addColorStop(1,'#6ee7b7');
+  ctx.fillStyle = grad;
+  roundRect(ctx,0,0,w,h,0,true,false);
+  ctx.fillStyle = 'rgba(255,255,255,.22)';
+  ctx.beginPath(); ctx.arc(230,130,180,0,Math.PI*2); ctx.fill();
+  ctx.fillStyle = '#11131c';
+  ctx.font = '900 34px Arial';
+  ctx.fillText('TSLMY INTERN QUEST', 70, 90);
+  ctx.font = '900 76px Arial';
+  wrapText(ctx, topTraitInfo.label, 70, 250, 920, 82);
+  ctx.font = '600 28px Arial';
+  wrapText(ctx, topTraitInfo.desc, 70, 385, 900, 36);
+  ctx.font = '900 30px Arial';
+  ctx.fillText(state.candidate.fullName || 'Candidate', 70, 555);
+  ctx.textAlign = 'right';
+  ctx.fillText(String(new Date().getFullYear()), w - 70, 555);
+  ctx.textAlign = 'left';
+  const a = document.createElement('a');
+  a.href = canvas.toDataURL('image/png');
+  a.download = `intern-quest-badge-${cleanName(state.candidate.fullName)}.png`;
+  a.click();
+}
+
+function roundRect(ctx, x, y, width, height, radius, fill, stroke) {
+  if (typeof radius === 'number') radius = {tl: radius, tr: radius, br: radius, bl: radius};
+  ctx.beginPath();
+  ctx.moveTo(x + radius.tl, y);
+  ctx.lineTo(x + width - radius.tr, y);
+  ctx.quadraticCurveTo(x + width, y, x + width, y + radius.tr);
+  ctx.lineTo(x + width, y + height - radius.br);
+  ctx.quadraticCurveTo(x + width, y + height, x + width - radius.br, y + height);
+  ctx.lineTo(x + radius.bl, y + height);
+  ctx.quadraticCurveTo(x, y + height, x, y + height - radius.bl);
+  ctx.lineTo(x, y + radius.tl);
+  ctx.quadraticCurveTo(x, y, x + radius.tl, y);
+  ctx.closePath();
+  if (fill) ctx.fill();
+  if (stroke) ctx.stroke();
+}
+
+function wrapText(ctx, text, x, y, maxWidth, lineHeight) {
+  const words = String(text).split(' ');
+  let line = '';
+  for (let n = 0; n < words.length; n++) {
+    const testLine = line + words[n] + ' ';
+    const metrics = ctx.measureText(testLine);
+    if (metrics.width > maxWidth && n > 0) {
+      ctx.fillText(line, x, y);
+      line = words[n] + ' ';
+      y += lineHeight;
+    } else {
+      line = testLine;
+    }
+  }
+  ctx.fillText(line, x, y);
+}
+
+function restartAssessment() {
+  if (!confirm('Restart the prototype and clear current answers?')) return;
+  state.screen = 'intro';
+  state.current = 0;
+  state.candidate = {};
+  state.answers = [];
+  state.written = {};
+  state.startedAt = null;
+  state.completedAt = null;
+  pendingSelection = null;
+  renderIntro();
+}
+
+initLevels();
+renderIntro();
+</script>
+</body>
+</html>
