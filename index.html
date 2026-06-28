@@ -848,7 +848,8 @@ const state = {
   answers: [],
   written: {},
   startedAt: null,
-  completedAt: null
+  completedAt: null,
+  submitted: false
 };
 
 const screen = document.getElementById('screen');
@@ -859,6 +860,11 @@ const xpScore = document.getElementById('xpScore');
 const signalCount = document.getElementById('signalCount');
 const levelList = document.getElementById('levelList');
 const sideTitle = document.getElementById('sideTitle');
+
+
+// Google Sheets submission endpoint.
+// Paste your deployed Google Apps Script Web App /exec URL here.
+const GOOGLE_APPS_SCRIPT_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbxwIvBKGnkIHNL2Tm7rUpU4vacxmQ1HcBbryGzVdWz06zX5-cnrTe62x1j859Idr5Y/exec';
 
 function initLevels() {
   levelList.innerHTML = stages.map(s => `<div class="level" id="level-${s.id}"><span>◆</span><span>${s.short}</span></div>`).join('');
@@ -1285,6 +1291,7 @@ function renderResults() {
     </div>
 
     <div class="btn-row">
+      <button class="btn success" onclick="submitAssessmentToGoogleSheet(this)">Submit Assessment to HR</button>
       <button class="btn" onclick="downloadReport()">Download HR Report</button>
       <button class="btn secondary" onclick="downloadCSV()">Download CSV Row</button>
       <button class="btn secondary" onclick="restartAssessment()">Restart Prototype</button>
@@ -1377,6 +1384,80 @@ function downloadCSV() {
   const topTrait = topEntries(scores.traits,1)[0]?.[0] || 'structured';
   const row = [state.candidate.fullName,state.candidate.email,state.candidate.mobile,state.candidate.school,state.candidate.course,state.candidate.availability,state.candidate.rolePreference,state.candidate.portfolio,recBand,recText,traitInfo[topTrait].label,...Object.keys(compInfo).map(k => scores.compPct[k] || 0),...Object.keys(roleInfo).map(k => scores.rolePct[k] || 0)];
   downloadText(`intern-quest-row-${cleanName(state.candidate.fullName)}.csv`, headers.map(csvEscape).join(',') + '\n' + row.map(csvEscape).join(','), 'text/csv');
+}
+
+
+function buildSubmissionPayload() {
+  const scores = getScores();
+  const [recBand, recText] = recommendation(scores);
+  const topTrait = topEntries(scores.traits, 1)[0]?.[0] || 'structured';
+
+  return {
+    timestamp: new Date().toISOString(),
+    sourceUrl: window.location.href,
+    fullName: state.candidate.fullName || '',
+    email: state.candidate.email || '',
+    mobile: state.candidate.mobile || '',
+    school: state.candidate.school || '',
+    course: state.candidate.course || '',
+    availability: state.candidate.availability || '',
+    rolePreference: state.candidate.rolePreference || '',
+    portfolio: state.candidate.portfolio || '',
+    startedAt: state.startedAt || '',
+    completedAt: state.completedAt || '',
+    recommendation: recBand,
+    recommendationText: recText,
+    primaryProfile: traitInfo[topTrait]?.label || '',
+    execution: scores.compPct.execution || 0,
+    learning: scores.compPct.learning || 0,
+    communication: scores.compPct.communication || 0,
+    collaboration: scores.compPct.collaboration || 0,
+    quality: scores.compPct.quality || 0,
+    ethics: scores.compPct.ethics || 0,
+    sustainability: scores.compPct.sustainability || 0,
+    editorial: scores.rolePct.editorial || 0,
+    creativeRole: scores.rolePct.creativeRole || 0,
+    bd: scores.rolePct.bd || 0,
+    campaign: scores.rolePct.campaign || 0,
+    flagsJson: JSON.stringify(scores.flags || {}),
+    writtenResponsesJson: JSON.stringify(state.written || {}),
+    answersJson: JSON.stringify(state.answers || []),
+    reportText: buildReportText()
+  };
+}
+
+async function submitAssessmentToGoogleSheet(button) {
+  if (!GOOGLE_APPS_SCRIPT_WEB_APP_URL || GOOGLE_APPS_SCRIPT_WEB_APP_URL.includes('PASTE_YOUR')) {
+    alert('Google Sheets submission is not configured yet. Paste your Apps Script Web App /exec URL into GOOGLE_APPS_SCRIPT_WEB_APP_URL inside index.html.');
+    return;
+  }
+  if (state.submitted) {
+    alert('This assessment has already been submitted from this browser session.');
+    return;
+  }
+
+  const originalText = button.textContent;
+  button.disabled = true;
+  button.textContent = 'Submitting...';
+
+  try {
+    const payload = buildSubmissionPayload();
+    await fetch(GOOGLE_APPS_SCRIPT_WEB_APP_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify(payload)
+    });
+
+    state.submitted = true;
+    button.textContent = 'Submitted to HR';
+    alert('Assessment submitted. Thank you.');
+  } catch (error) {
+    console.error(error);
+    button.disabled = false;
+    button.textContent = originalText;
+    alert('Submission failed. Please check your internet connection or download the HR report/CSV as a backup.');
+  }
 }
 
 function downloadBadge() {
