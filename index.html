@@ -909,7 +909,6 @@ function renderIntro() {
       <div>
         <div class="stage-title">Prototype v1</div>
         <h1>Turn intern selection into a quest.</h1>
-        <button class="btn success" onclick="submitAssessmentToGoogleSheet(this)">Submit Assessment to HR</button>
         <p>This interactive HTML game captures practical hiring signals across workstyle, learning agility, communication, role fit, work quality, ethics, and sustainability. Candidates complete scenario choices and reflection prompts. HR gets a downloadable assessment summary.</p>
         <div class="pill-grid">
           <span class="pill">40 scenarios</span>
@@ -922,8 +921,11 @@ function renderIntro() {
         <div class="btn-row">
           <button class="btn" onclick="renderCandidateForm()">Start Quest</button>
           <button class="btn secondary" onclick="renderHowItWorks()">How scoring works</button>
+          <button class="btn secondary" onclick="loadDummyAssessment()">Load Dummy Completed Result</button>
+          <button class="btn secondary" onclick="submitDummyAssessmentToGoogleSheet(this)">Submit Dummy Test Row</button>
         </div>
         <p class="small-note">Privacy note: this prototype intentionally avoids NRIC/passport and date of birth. Collect those only later if needed for offer/onboarding documentation.</p>
+        <p class="small-note"><strong>Testing note:</strong> the dummy buttons are for HR setup only. Remove or hide them before sending the link to candidates.</p>
       </div>
       <div class="hero-visual">
         <div class="quest-map">
@@ -999,8 +1001,114 @@ function renderCandidateForm() {
     </div>
     <div class="btn-row">
       <button class="btn" onclick="startQuiz()">Enter Stage 1</button>
+      <button class="btn secondary" onclick="fillDummyCandidateFields()">Fill Dummy Candidate Info</button>
+      <button class="btn secondary" onclick="loadDummyAssessment()">Load Dummy Completed Result</button>
       <button class="btn secondary" onclick="renderIntro()">Back</button>
     </div>`;
+}
+
+function fillDummyCandidateFields() {
+  const dummy = getDummyCandidate();
+  const fieldMap = {
+    fullName: dummy.fullName,
+    email: dummy.email,
+    mobile: dummy.mobile,
+    school: dummy.school,
+    course: dummy.course,
+    availability: dummy.availability,
+    portfolio: dummy.portfolio
+  };
+
+  Object.entries(fieldMap).forEach(([id, value]) => {
+    const el = document.getElementById(id);
+    if (el) el.value = value;
+  });
+
+  const roleEl = document.getElementById('rolePreference');
+  if (roleEl) roleEl.value = dummy.rolePreference;
+
+  const consentEl = document.getElementById('consent');
+  if (consentEl) consentEl.checked = true;
+}
+
+function getDummyCandidate() {
+  const stamp = new Date().toISOString().replace(/[-:.TZ]/g, '').slice(0, 14);
+  return {
+    fullName: `Dummy Test Candidate ${stamp}`,
+    email: `dummy.candidate.${stamp}@example.com`,
+    mobile: '0123456789',
+    school: 'Universiti Dummy Malaysia',
+    course: 'Bachelor of Communication',
+    availability: 'Jan 2027 – Jun 2027',
+    rolePreference: 'Creative Social Media Assistant',
+    portfolio: 'https://example.com/dummy-portfolio'
+  };
+}
+
+function fillDummyAssessmentData() {
+  const dummyCandidate = getDummyCandidate();
+  const started = new Date(Date.now() - 18 * 60 * 1000).toISOString();
+  const completed = new Date().toISOString();
+
+  // Preset choices create a realistic strong intern profile with Creative/Campaign lean.
+  // Values are zero-based option indexes: 0 = A, 1 = B, etc.
+  const dummyAnswerIndexes = [
+    0, 0, 3, 0, 0, 0, 0, 0,
+    2, 1, 0, 2, 0, 0,
+    0, 0, 2, 0, 0, 0,
+    3, 0, 4, 0, 0, 0, 0, 3,
+    0, 0, 3, 0, 0, 0,
+    0, 0, 0, 0, 0, 2
+  ];
+
+  state.candidate = dummyCandidate;
+  state.startedAt = started;
+  state.completedAt = completed;
+  state.current = questions.length - 1;
+  state.submitted = false;
+  state.written = {
+    proudProject: 'I led the content planning for a university open day recap video. I drafted the shot list, coordinated two classmates for filming, edited the first cut in CapCut, and adjusted the hook after feedback. The final post helped the student council promote the next event and taught me to plan around both audience attention and stakeholder needs.',
+    feedbackMoment: 'A lecturer once told me my presentation had good ideas but unclear structure. I asked which section confused the audience most, rewrote the flow into problem, insight, solution and action, then volunteered to present the revised version the following week. The second attempt was clearer and I now outline before designing slides.',
+    roleInterest: 'I am most interested in Creative Social Media Assistant because I enjoy turning observations into short-form hooks and testing what makes people stop scrolling. I am also open to Campaign Management because I like coordinating timelines and making sure deliverables are clear.',
+    managerStyle: 'I work best with a manager who gives a clear brief, examples of good work, and regular check-ins early in the task. Once I understand the expected standard, I prefer some space to execute and come back with a draft for feedback.',
+    portfolioNote: 'Please look at the short-form video samples and campaign planning slides in my portfolio. They show my ability to connect content ideas with audience insight and timeline discipline.'
+  };
+
+  state.answers = questions.map((q, i) => {
+    const idx = Math.min(dummyAnswerIndexes[i] ?? 0, q.options.length - 1);
+    const selected = q.options[idx];
+    return {
+      qid: q.id,
+      question: q.text,
+      stage: q.stage,
+      label: selected.label,
+      answer: selected.text,
+      scores: selected.scores,
+      flags: selected.flags
+    };
+  });
+
+  writtenPrompts.forEach(p => {
+    state.answers.push({
+      qid: p.id,
+      question: p.label,
+      stage: 'written',
+      label: 'WRITTEN',
+      answer: state.written[p.id] || '[Blank]',
+      scores: {},
+      flags: state.written[p.id] ? [] : ['writtenGap']
+    });
+  });
+}
+
+function loadDummyAssessment() {
+  fillDummyAssessmentData();
+  renderResults();
+}
+
+async function submitDummyAssessmentToGoogleSheet(button) {
+  fillDummyAssessmentData();
+  await submitAssessmentToGoogleSheet(button);
 }
 
 function startQuiz() {
